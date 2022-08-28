@@ -36,8 +36,8 @@ def compute_sample_size(n, p_positive, p_at_least_1):
         
         delta_m = 0
         while inequality_left_side(m, n, p_positive, p_at_least_1) < upper_bound:
-            delta_m = 0.5 * step_size(upper_bound, m, n, p_positive, p_at_least_1)
-            if delta_m == 0 or -delta_m > 0.5*m:
+            delta_m = (upper_bound - inequality_left_side(m, n, p_positive, p_at_least_1)) / dgamma_approx(m, n, p_positive, p_at_least_1)
+            if delta_m == 0:
                 break
             else:
                 m += delta_m
