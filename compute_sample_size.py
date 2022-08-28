@@ -22,32 +22,31 @@ def step_size(upper_bound, m, n, p_positive, p_at_least_1):
   
 def compute_sample_size(n, p_positive, p_at_least_1):
     
-    m = int(log(1-p_at_least_1) / log(1-p_positive))
-    asymptotic_limit = m + 1
+    asymptotic_limit = int(log(1-p_at_least_1) / log(1-p_positive)) + 1
+    m = min([asymptotic_limit, int((1-p_positive)*n)])
     
-    if n <= 1/p_positive or m >= n:
+    if n <= int(1/p_positive) + 1 or m >= n or n <= asymptotic_limit:
         return {"n" : n, "m" : n, "p_detection" : 1}
     
     else:
     
-        upper_bound = compute_upper_bound(n, p_positive, p_at_least_1)
-        if inequality_left_side(m, n, p_positive, p_at_least_1) > upper_bound:
-            return {"n" : n, "m" : asymptotic_limit, "p_detection" : p_at_least_1}
-        
+        upper_bound = compute_upper_bound(n, p_positive, p_at_least_1)    
         delta_m = 0
-        while inequality_left_side(m, n, p_positive, p_at_least_1) < upper_bound:
-            delta_m = (upper_bound - inequality_left_side(m, n, p_positive, p_at_least_1)) / dgamma_approx(m, n, p_positive, p_at_least_1)
+        while inequality_left_side(m, n, p_positive, p_at_least_1) < upper_bound and m <= n:
+            if (1-p_positive)*n - m + 1 <= 0:
+                break
+            delta_m = 0.5*(upper_bound - inequality_left_side(m, n, p_positive, p_at_least_1)) / dgamma_approx(m, n, p_positive, p_at_least_1)
             if delta_m == 0:
                 break
             else:
                 m += delta_m
+
         
-        m = int(m) + 1
-        while inequality_left_side(m, n, p_positive, p_at_least_1) > upper_bound and m < asymptotic_limit:
+        m = min([int(m) + 1, n])
+        while inequality_left_side(m, n, p_positive, p_at_least_1) > upper_bound and m < asymptotic_limit and m < n:
             m += 1
         
         p = 1 - exp(lgamma((1-p_positive)*n + 1) + lgamma(n - m + 1) - lgamma((1-p_positive)*n - m + 1) - lgamma(n + 1))
-        p = p if p >= p_at_least_1 and p < 1 else p_at_least_1
+        p = p if p >= p_at_least_1 and p < 1 else 1 if m == n else p_at_least_1
         
-
         return {"n" : n, "m" : m, "p_detection" : p}
