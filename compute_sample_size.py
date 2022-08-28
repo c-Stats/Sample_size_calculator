@@ -47,7 +47,7 @@ def compute_sample_size(n, p_positive, p_at_least_1):
             m += 1
         
         p = 1 - exp(lgamma((1-p_positive)*n + 1) + lgamma(n - m + 1) - lgamma((1-p_positive)*n - m + 1) - lgamma(n + 1))
-        p = p if p !=0 and p != 1 else p_at_least_1
+        p = p if p >= p_at_least_1 and p < 1 else p_at_least_1
         
 
         return {"n" : n, "m" : m, "p_detection" : p}
