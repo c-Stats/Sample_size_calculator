@@ -32,8 +32,7 @@ def compute_sample_size(n, p_positive, p_at_least_1):
     
         upper_bound = compute_upper_bound(n, p_positive, p_at_least_1)
         if inequality_left_side(m, n, p_positive, p_at_least_1) > upper_bound:
-            p_detection = 1 - exp(asymptotic_limit * log(1-p_positive))
-            return {"n" : n, "m" : asymptotic_limit, "p_detection" : p_detection}
+            return {"n" : n, "m" : asymptotic_limit, "p_detection" : p_at_least_1}
         
         delta_m = 0
         while inequality_left_side(m, n, p_positive, p_at_least_1) < upper_bound:
@@ -44,7 +43,7 @@ def compute_sample_size(n, p_positive, p_at_least_1):
                 m += delta_m
         
         m = int(m) + 1
-        while inequality_left_side(m, n, p_positive, p_at_least_1) > upper_bound and m <= asymptotic_limit:
+        while inequality_left_side(m, n, p_positive, p_at_least_1) > upper_bound and m < asymptotic_limit:
             m += 1
         
         p = 1 - exp(lgamma((1-p_positive)*n + 1) + lgamma(n - m + 1) - lgamma((1-p_positive)*n - m + 1) - lgamma(n + 1))
